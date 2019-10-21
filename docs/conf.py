@@ -26,9 +26,10 @@ copyright = u'2019, Luca Baldini'
 author = u'Luca Baldini'
 
 # The short X.Y version
-version = u''
+from version import __version__
+version = __version__
 # The full version, including alpha/beta/rc tags
-release = u'0.0.0'
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------
