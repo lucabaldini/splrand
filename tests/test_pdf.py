@@ -64,7 +64,6 @@ class testPdf(unittest.TestCase):
         rnd = pdf.rnd(1000000)
         plt.hist(rnd, bins=200)
 
-
     def test_gauss(self, mu=0., sigma=1., support=10., num_points=500):
         """Unit test with a gaussian distribution.
         """
