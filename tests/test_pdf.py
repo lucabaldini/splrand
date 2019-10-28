@@ -35,14 +35,21 @@ class testPdf(unittest.TestCase):
     """Unit test for the pdf module.
     """
 
-    def test_triangular(self):
+    def _test_triangular_base(self, xmin=0., xmax=1.):
         """Unit test with a triangular distribution.
         """
-        x = np.linspace(0., 1., 101)
-        y = 2. * x
+        x = np.linspace(xmin, xmax, 101)
+        y = 2. / (xmax - xmin)**2. * (x - xmin)
         pdf = ProbabilityDensityFunction(x, y)
-        a = np.array([0.2, 0.6])
-        print(pdf(a))
+
+        # Verify that the pdf normalization is one.
+        norm = pdf.integral(xmin, xmax)
+        self.assertAlmostEqual(norm, 1.0)
+
+        # Verify that the pdf, evaluated on the input x-grid, matches the
+        # input y values.
+        delta = abs(pdf(x) - y)
+        self.assertTrue((delta < 1e-10).all())
 
         plt.figure('pdf triangular')
         plt.plot(x, pdf(x))
@@ -64,6 +71,14 @@ class testPdf(unittest.TestCase):
         rnd = pdf.rnd(1000000)
         plt.hist(rnd, bins=200)
 
+    def test_triangular(self):
+        """
+        """
+        self._test_triangular_base(0., 1.)
+        self._test_triangular_base(0., 2.)
+        self._test_triangular_base(1., 2.)
+
+    @unittest.skip('Temporary')
     def test_gauss(self, mu=0., sigma=1., support=10., num_points=500):
         """Unit test with a gaussian distribution.
         """
