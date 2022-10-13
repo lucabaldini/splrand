@@ -33,24 +33,30 @@ class ProbabilityDensityFunction(InterpolatedUnivariateSpline):
     Parameters
     ----------
     x : array-like
-        The array of x values to be passed to the pdf.
+        The array of x values to be passed to the pdf, assumed to be sorted.
 
     y : array-like
         The array of y values to be passed to the pdf.
+
+    k : int
+        The order of the splines to be created.
     """
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, k=3):
         """Constructor.
         """
-        InterpolatedUnivariateSpline.__init__(self, x, y)
+        # Normalize the pdf, if it is not.
+        norm = InterpolatedUnivariateSpline(x, y, k=k).integral(x[0], x[-1])
+        y /= norm
+        super().__init__(x, y, k=k)
         ycdf = np.array([self.integral(x[0], xcdf) for xcdf in x])
-        self.cdf = InterpolatedUnivariateSpline(x, ycdf)
+        self.cdf = InterpolatedUnivariateSpline(x, ycdf, k=k)
         # Need to make sure that the vector I am passing to the ppf spline as
         # the x values has no duplicates---and need to filter the y
         # accordingly.
         xppf, ippf = np.unique(ycdf, return_index=True)
         yppf = x[ippf]
-        self.ppf = InterpolatedUnivariateSpline(xppf, yppf)
+        self.ppf = InterpolatedUnivariateSpline(xppf, yppf, k=k)
 
     def prob(self, x1, x2):
         """Return the probability for the random variable to be included
